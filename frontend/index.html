@@ -384,6 +384,7 @@ select.form-input option{background:var(--bg3)}
         <div class="tab active" onclick="switchTab(event,'findings')">Findings</div>
         <div class="tab" onclick="switchTab(event,'compare')">Compare scans</div>
         <div class="tab" onclick="switchTab(event,'export')">Export</div>
+        <div class="tab" onclick="switchTab(event,'manage');loadManageScans()">Manage</div>
       </div>
       <div id="tab-findings" class="tab-content active">
         <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center">
@@ -426,6 +427,13 @@ select.form-input option{background:var(--bg3)}
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div id="tab-manage" class="tab-content">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-trash"></i> Manage scans</div>
+          <div style="color:var(--text3);font-size:12px;font-family:var(--font-mono);margin-bottom:14px">// Permanently delete scans you no longer need</div>
+          <div id="manage-scans-list"><div style="color:var(--text3);font-size:12px;font-family:var(--font-mono)">// Click Manage tab to load</div></div>
         </div>
       </div>
     </div>
@@ -1733,6 +1741,49 @@ function useAsCustomCat(prompt) {
     const ta = document.getElementById('custom-prompts');
     if (ta) ta.value = ta.value ? ta.value + '\n' + prompt : prompt;
   }, 200);
+}
+
+async function loadManageScans() {
+  const el = document.getElementById('manage-scans-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:12px;font-family:var(--font-mono)">// Loading...</div>';
+  try {
+    const scans = await api('/api/scans');
+    if (!scans.length) {
+      el.innerHTML = '<div style="color:var(--text3);font-size:12px;font-family:var(--font-mono)">// No scans found</div>';
+      return;
+    }
+    el.innerHTML = scans.map(s => {
+      const srcCls = s.source === 'pyrit_real' ? 'badge-cyan' : s.source === 'direct' ? 'badge-green' : 'badge-gray';
+      const srcLbl = s.source === 'pyrit_real' ? 'REAL' : s.source === 'direct' ? 'DIRECT' : 'SIM';
+      const date = (s.started_at || '').slice(0, 10);
+      const nameEsc = s.name.replace(/'/g, "\\'");
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">'
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-family:var(--font-mono);font-size:13px;color:var(--text)">' + s.name + '</div>'
+        + '<div style="display:flex;gap:6px;margin-top:4px">'
+        + '<span class="badge ' + srcCls + '">' + srcLbl + '</span>'
+        + '<span class="badge badge-gray">' + date + '</span>'
+        + (s.asr !== undefined ? '<span class="badge badge-gray">ASR ' + s.asr + '%</span>' : '')
+        + (s.total_attacks ? '<span class="badge badge-gray">' + s.total_attacks + ' attacks</span>' : '')
+        + '</div></div>'
+        + '<button class="btn btn-sm" style="border:1px solid var(--red);color:var(--red);background:transparent;flex-shrink:0" onclick="deleteScan(\'' + s.id + '\',\'' + nameEsc + '\')">'
+        + '<i class="ti ti-trash"></i> Delete</button></div>';
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--red);font-size:12px;font-family:var(--font-mono)">// Error: ' + e.message + '</div>';
+  }
+}
+
+async function deleteScan(id, name) {
+  if (!confirm('Delete scan "' + name + '"?\n\nThis will permanently remove all findings and logs.')) return;
+  try {
+    await api('/api/scans/' + id, { method: 'DELETE' });
+    loadManageScans();
+    loadResultsPage();
+  } catch(e) {
+    alert('Error deleting scan: ' + e.message);
+  }
 }
 </script>
 </body>
