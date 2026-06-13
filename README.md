@@ -170,6 +170,7 @@ En la UI → **Settings**:
 ### ⚠️ Paso crítico: filtro de contenido para red teaming
 
 El filtro predeterminado de Azure bloquea los prompts adversariales antes de llegar al modelo. Sin configurar esto, todos los scans darán error 400 y ASR 0% incorrecto.
+NOTA: Esto lo hicimos para comprobar que funcionaban ataques sin entrar mucho detalle,  este paso es salvable
 
 Ve a **ai.azure.com → Safety + Security → Content filters → + Crear**:
 
