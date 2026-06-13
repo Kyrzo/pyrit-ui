@@ -51,28 +51,8 @@ PyRIT UI es una plataforma web open-source para el **red teaming de sistemas de 
 ---
 
 ## 🏗️ Arquitectura
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/1067ec81-7660-4a58-8ca4-db5e5d6f1baa" />
 
-```
-Navegador
-    │
-    ▼
-Apache / Nginx  (HTTPS + reverse proxy)
-    │
-    ├── GET /       →  frontend/index.html  (HTML + CSS + JS estático)
-    │
-    └── GET /api/*  →  FastAPI :8000
-                            │
-                  ┌─────────┴──────────┐
-                  │                    │
-             SQLite DB          Azure AI Foundry
-             (scans,             ┌────────────┐
-              users,             │ PyRIT SDK  │
-              findings)          │ RedTeam    │
-                                 └─────┬──────┘
-                                       │
-                                  GPT-4o target
-                                  GPT-4o judge
-```
 
 ### Modos de ejecución
 
