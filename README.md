@@ -1,6 +1,7 @@
 <div align="center">
+<img width="1472" height="1000" alt="image" src="https://github.com/user-attachments/assets/87b07703-58ef-4f96-b12f-415bce8c4105" />
 
-# 🛡️ PyRIT UI
+# 🛡️ PyRIT UI by Cibersecblog
 
 ### La interfaz visual que Microsoft no construyó para el red teaming con IA
 
